@@ -5,8 +5,11 @@ import os
 
 
 class ResponseGenerator:
-    @staticmethod
-    def prepare_prompt(query_text, matching_chunks):
+    def __init__(self):
+        llama_32 = "meta-llama/Llama-3.2-3B-Instruct"
+        self.generator = pipeline(model=llama_32, device="cuda", torch_dtype=torch.bfloat16)
+
+    def prepare_prompt(self, query_text, matching_chunks):
         context = "\n\n---\n\n".join([doc.page_content for doc, _score in matching_chunks])
         prompt = [
           {"role": "system", "content": "Answer the question based only on the following context. If the answer cannot be found, reply: 'The context does not contain enough information.\n\n'" + context + "\n\n"},
@@ -14,23 +17,18 @@ class ResponseGenerator:
         ]
         return prompt
 
-    @staticmethod
-    def predict(prompt):
-        llama_32 = "meta-llama/Llama-3.2-3B-Instruct"
-
-        generator = pipeline(model=llama_32, device="cuda", torch_dtype=torch.bfloat16)
-        generation = generator(
+    def predict(self, prompt):
+        generation = self.generator(
           prompt,
           do_sample=False,
           temperature=1.0,
           top_p=1,
           max_new_tokens=50
         )
-        response = generator(prompt, max_new_tokens=512, do_sample=False)
+        response = self.generator(prompt, max_new_tokens=512, do_sample=False)
         return response[0]['generated_text']
 
-    @staticmethod
-    def format_response(response, matching_chunks):
+    def format_response(self, response, matching_chunks):
         sources = set([doc.metadata.get("source", None) for doc, _score in matching_chunks])
         sources_file_names = [os.path.basename(source) for source in sources]
         delimiter=", "

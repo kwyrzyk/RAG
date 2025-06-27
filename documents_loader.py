@@ -23,7 +23,6 @@ class DocumentsLoader:
             loader_cls=PyPDFLoader
         )
         pdf_docs = pdf_loader.load()
-        print(len(pdf_docs))
 
         txt_loader = DirectoryLoader(
             path=dir_path,

@@ -7,4 +7,5 @@ sentence-transformers
 transformers
 tqdm
 langchain-community
+huggingface_hub
 argparse
