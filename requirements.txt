@@ -1,0 +1,5 @@
+pypdf
+Chroma
+sentence_transformers
+chromadb
+langchain-huggingface
